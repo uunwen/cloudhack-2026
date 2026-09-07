@@ -8,6 +8,7 @@ import GenreSelect from './pages/GenreSelect'
 import Player from './pages/Player'
 import Quiz from './pages/Quiz'
 import Chat from './pages/Chat'
+import Sessions from './pages/Sessions'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="/player" element={<Player />} />
               <Route path="/quiz" element={<Quiz />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/sessions" element={<Sessions />} />
             </Routes>
           </BrowserRouter>
         </SessionStatsProvider>
