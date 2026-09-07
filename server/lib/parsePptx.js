@@ -30,6 +30,7 @@ async function parsePptx(buffer) {
       sectionTitle: firstText || `Slide ${i + 1}`,
       bodyText,
       notes: notesText || null,
+      slideNumber: i + 1,
     }
   })
 }

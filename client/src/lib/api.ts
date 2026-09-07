@@ -25,6 +25,38 @@ export interface ParseResult {
   failedFiles: FailedFile[]
 }
 
+export type ChatRole = 'user' | 'assistant'
+
+export interface ChatHistoryMessage {
+  role: ChatRole
+  content: string
+}
+
+export interface ChatSource {
+  sectionId: string
+  label?: string
+  sourceName?: string
+  sectionTitle?: string
+  pageNumber?: number
+  slideNumber?: number
+  headingPath?: string[]
+}
+
+export interface ChatResolvedScope {
+  type: string
+  value: string | number | null
+  label: string | null
+  sourceName?: string
+  sourceOrdinal?: number
+  sectionIds: string[]
+}
+
+export interface ChatResult {
+  answer: string
+  sources: ChatSource[]
+  resolvedScope: ChatResolvedScope | null
+}
+
 export async function parseContent(input: { files: File[]; text: string }): Promise<ParseResult> {
   const formData = new FormData()
   input.files.forEach((file) => formData.append('files', file))
@@ -121,4 +153,33 @@ export async function generateQuiz(sections: ParsedSection[]): Promise<QuizQuest
   }
 
   return data as QuizQuestion[]
+}
+
+export async function askNotes(input: {
+  question: string
+  sections: ParsedSection[]
+  history?: ChatHistoryMessage[]
+  activeScope?: ChatResolvedScope | null
+}): Promise<ChatResult> {
+  const response = await safeFetch(`${API_BASE_URL}/api/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+
+  const data = await response.json().catch(() => null)
+
+  if (
+    !response.ok ||
+    !data ||
+    typeof data.answer !== 'string' ||
+    !Array.isArray(data.sources)
+  ) {
+    const message = data && typeof data === 'object' && 'error' in data
+      ? data.error
+      : 'Something went wrong while checking your notes. Please try again.'
+    throw new Error(message)
+  }
+
+  return data as ChatResult
 }

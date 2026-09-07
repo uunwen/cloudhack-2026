@@ -7,6 +7,7 @@ async function parseDocx(buffer) {
 
   const sections = []
   let current = null
+  const headingStack = []
 
   $('body')
     .children()
@@ -16,7 +17,16 @@ async function parseDocx(buffer) {
       if (!text) return
 
       if (/^h[1-6]$/.test(tag)) {
-        current = { sectionTitle: text, bodyText: '', notes: null }
+        const headingLevel = Number(tag.slice(1))
+        headingStack[headingLevel - 1] = text
+        headingStack.length = headingLevel
+        current = {
+          sectionTitle: text,
+          bodyText: '',
+          notes: null,
+          headingLevel,
+          headingPath: headingStack.filter(Boolean),
+        }
         sections.push(current)
         return
       }

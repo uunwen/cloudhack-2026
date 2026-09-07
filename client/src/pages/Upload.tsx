@@ -78,6 +78,12 @@ function Upload() {
     navigate('/genre-select')
   }
 
+  function handleAskNotes() {
+    if (!result) return
+    setSections(result.sections)
+    navigate('/chat')
+  }
+
   function summaryText() {
     if (!result) return ''
     const fileCount = files.length
@@ -127,9 +133,14 @@ function Upload() {
               </div>
             )}
           </Card>
-          <Button variant="primary" onClick={handleContinue}>
-            Continue
-          </Button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="primary" onClick={handleContinue}>
+              Create Podcast
+            </Button>
+            <Button variant="secondary" onClick={handleAskNotes}>
+              Ask Your Notes
+            </Button>
+          </div>
         </div>
       </PageLayout>
     )
