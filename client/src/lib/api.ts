@@ -155,6 +155,42 @@ export async function generateQuiz(sections: ParsedSection[]): Promise<QuizQuest
   return data as QuizQuestion[]
 }
 
+export async function transcribeAudio(blob: Blob): Promise<string> {
+  const formData = new FormData()
+  formData.append('audio', blob, 'recording.webm')
+
+  const response = await safeFetch(`${API_BASE_URL}/api/transcribe`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok || !data || typeof data.text !== 'string') {
+    const message = data && typeof data === 'object' && 'error' in data ? data.error : 'Something went wrong while transcribing your recording.'
+    throw new Error(message)
+  }
+
+  return data.text
+}
+
+export async function synthesizeChatSpeech(text: string): Promise<string> {
+  const response = await safeFetch(`${API_BASE_URL}/api/chat-speech`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  })
+
+  const data = await response.json().catch(() => null)
+
+  if (!response.ok || !data || typeof data.audioUrl !== 'string') {
+    const message = data && typeof data === 'object' && 'error' in data ? data.error : 'Something went wrong while generating audio.'
+    throw new Error(message)
+  }
+
+  return data.audioUrl
+}
+
 export async function askNotes(input: {
   question: string
   sections: ParsedSection[]

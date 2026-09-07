@@ -21,6 +21,8 @@ app.use('/api', require('./routes/generateAudio'))
 app.use('/api', require('./routes/generateSummary'))
 app.use('/api', require('./routes/generateQuiz'))
 app.use('/api', require('./routes/chat'))
+app.use('/api', require('./routes/transcribe'))
+app.use('/api', require('./routes/chatSpeech'))
 
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`)
