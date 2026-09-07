@@ -11,7 +11,14 @@ async function parseImage(buffer, mimetype) {
     throw new Error('Could not extract any content from this image.')
   }
 
-  return [{ sectionTitle: 'Image', bodyText: text, notes: null }]
+  return [
+    {
+      sectionTitle: 'Image',
+      bodyText: text,
+      notes: null,
+      metadata: { extractionMethod: 'vision', mimeType: mimetype },
+    },
+  ]
 }
 
 module.exports = parseImage

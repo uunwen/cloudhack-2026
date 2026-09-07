@@ -7,6 +7,7 @@ import Upload from './pages/Upload'
 import GenreSelect from './pages/GenreSelect'
 import Player from './pages/Player'
 import Quiz from './pages/Quiz'
+import Chat from './pages/Chat'
 import Sessions from './pages/Sessions'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
               <Route path="/genre-select" element={<GenreSelect />} />
               <Route path="/player" element={<Player />} />
               <Route path="/quiz" element={<Quiz />} />
+              <Route path="/chat" element={<Chat />} />
               <Route path="/sessions" element={<Sessions />} />
             </Routes>
           </BrowserRouter>

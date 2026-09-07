@@ -2,6 +2,7 @@ const path = require('path')
 const { pathToFileURL } = require('url')
 const { createCanvas, ImageData, DOMMatrix, Path2D } = require('@napi-rs/canvas')
 const { extractTextFromImage } = require('./openaiClient')
+const { createTextPdfSections, createVisionPdfMetadata } = require('./createPdfSections')
 
 // pdfjs-dist's Node rendering path assumes these browser globals exist; @napi-rs/canvas
 // ships compatible implementations we can hand it before rendering any page.
@@ -46,7 +47,17 @@ class NapiCanvasFactory {
 
 async function getPageText(page) {
   const content = await page.getTextContent()
-  return content.items.map((item) => item.str).join(' ')
+  let text = ''
+  for (const item of content.items) {
+    if (typeof item.str !== 'string' || !item.str) continue
+    text += item.str
+    text += item.hasEOL ? '\n' : ' '
+  }
+  return text
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 async function renderPageToPngBuffer(page) {
@@ -68,18 +79,19 @@ async function parsePdf(buffer) {
   const pageTexts = []
   for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
     const page = await pdfDocument.getPage(pageNumber)
-    pageTexts.push(await getPageText(page))
+    pageTexts.push({ pageNumber, text: await getPageText(page) })
   }
 
-  const fullText = pageTexts.join('\n\n').trim()
+  const fullText = pageTexts.map((page) => page.text).join('\n\n').trim()
   const avgCharsPerPage = fullText.length / pdfDocument.numPages
 
   if (avgCharsPerPage >= MIN_AVG_CHARS_PER_PAGE) {
-    return [{ sectionTitle: 'Document', bodyText: fullText, notes: null }]
+    return createTextPdfSections(pageTexts, pdfDocument.numPages)
   }
 
   // Near-empty text layer -- likely a scanned PDF. Render pages to images and use vision.
   const pageCount = Math.min(pdfDocument.numPages, MAX_VISION_PAGES)
+  const metadata = createVisionPdfMetadata(pdfDocument.numPages, pageCount)
   const sections = []
   for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
     const page = await pdfDocument.getPage(pageNumber)
@@ -93,6 +105,8 @@ async function parsePdf(buffer) {
       sectionTitle: `Page ${pageNumber}`,
       bodyText: extracted || '(No readable content found on this page.)',
       notes: null,
+      pageNumber,
+      metadata,
     })
   }
 
