@@ -11,6 +11,7 @@ export default {
       },
       fontFamily: {
         sans: ['Nunito', 'sans-serif'],
+        display: ['Fredoka', 'sans-serif'],
       },
       keyframes: {
         glow: {

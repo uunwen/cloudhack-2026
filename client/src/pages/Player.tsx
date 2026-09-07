@@ -13,7 +13,6 @@ import { pickInterventionLine, pickWelcomeBackLine, type InterventionType } from
 
 type Status = 'loading' | 'ready' | 'error'
 type SummaryStatus = 'loading' | 'ready' | 'error'
-type PanelView = 'transcript' | 'summary'
 type MonitorPhase = 'consent' | 'active'
 const PLAYBACK_RATES = [1, 1.5, 2] as const
 
@@ -67,7 +66,6 @@ function Player() {
   const [finished, setFinished] = useState(false)
   const [playbackRate, setPlaybackRate] = useState<(typeof PLAYBACK_RATES)[number]>(1)
 
-  const [panelView, setPanelView] = useState<PanelView>('transcript')
   const [summaryStatus, setSummaryStatus] = useState<SummaryStatus>('loading')
   const [summary, setSummary] = useState<string | null>(null)
   const [summaryError, setSummaryError] = useState<string | null>(null)
@@ -414,16 +412,9 @@ function Player() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setPanelView((v) => (v === 'transcript' ? 'summary' : 'transcript'))}
-          className="self-end text-sm font-semibold text-accent-coral hover:opacity-80 font-sans"
-        >
-          {panelView === 'transcript' ? 'Show Summary' : 'Show Transcript'}
-        </button>
-
-        {panelView === 'transcript' && (
-          <Card className="w-full text-left max-h-[420px] overflow-y-auto flex flex-col gap-3">
+        <div className="w-full text-left">
+          <p className="text-sm font-semibold text-text-dark/70 font-sans mb-2">Transcript</p>
+          <Card className="w-full text-left max-h-[220px] overflow-y-auto flex flex-col gap-3">
             {audioScript.map((line, i) => {
               const isCurrent = i === currentIndex
               const isPast = i < currentIndex
@@ -443,10 +434,11 @@ function Player() {
               )
             })}
           </Card>
-        )}
+        </div>
 
-        {panelView === 'summary' && (
-          <Card className="w-full text-left max-h-[420px] overflow-y-auto">
+        <div className="w-full text-left">
+          <p className="text-sm font-semibold text-text-dark/70 font-sans mb-2">Summary</p>
+          <Card className="w-full text-left max-h-[220px] overflow-y-auto">
             {summaryStatus === 'loading' && <LoadingState message="Jotting down the highlights..." />}
             {summaryStatus === 'error' && (
               <div className="flex flex-col items-center gap-4 py-6 text-center">
@@ -468,7 +460,7 @@ function Player() {
               </ul>
             )}
           </Card>
-        )}
+        </div>
 
         {finished && (
           <Button variant="primary" onClick={() => navigate('/quiz')}>
