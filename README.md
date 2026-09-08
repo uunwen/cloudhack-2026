@@ -1,5 +1,7 @@
 # Lore Drop 🎧
 
+**[Try it live →](https://cloudhack-2026-2.onrender.com)**
+
 Turn your lecture slides, notes, or readings into a gossip podcast episode you'll actually want to listen to — then get quizzed on it before the tea has time to go cold.
 
 ## The problem
