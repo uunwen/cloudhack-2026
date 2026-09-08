@@ -7,9 +7,15 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "https://cloudhack-2026-1.onrender.com"],
+//   }),
+// );
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://cloudhack-2026-1.onrender.com"],
+    origin: ["http://localhost:5173", "https://cloudhack-2026-2.onrender.com"],
   }),
 );
 // Extracted text is sent back for script, summary, and quiz generation. Keep that
